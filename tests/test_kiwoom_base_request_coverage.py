@@ -1,8 +1,8 @@
 """Kiwoom base의 인증 및 TR 요청 계약을 외부 호출 없이 검증한다."""
 
-from datetime import datetime, timedelta
 import builtins
 import types
+from datetime import datetime
 from unittest.mock import MagicMock
 
 import pytest
@@ -42,6 +42,9 @@ class TestKiwoomBaseRequestExecution:
 
         assert api._calculate_token_expires({"expires_in": "60"}) > datetime.now()
         assert api._calculate_token_expires({"expires_at": "2099-01-01T00:00:00Z"}).year == 2099
+        assert api._calculate_token_expires({"expires_dt": "20260730121943"}) == datetime(
+            2026, 7, 30, 12, 19, 43
+        )
         with pytest.raises(KiwoomAPIError, match="만료 정보"):
             api._calculate_token_expires({"expires_in": "invalid"})
 
