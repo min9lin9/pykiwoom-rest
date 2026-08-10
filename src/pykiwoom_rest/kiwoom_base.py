@@ -419,8 +419,13 @@ class KiwoomAPIBase(BaseAPIClient, RaiseWithTraceMixin):
 
         expires_at = token_payload.get("expires_at") or token_payload.get("expires_dt")
         if expires_at:
+            expires_at_text = str(expires_at)
             try:
-                return datetime.fromisoformat(str(expires_at).replace("Z", "+00:00")).replace(tzinfo=None)
+                if len(expires_at_text) == 14 and expires_at_text.isdigit():
+                    return datetime.strptime(expires_at_text, "%Y%m%d%H%M%S")
+                return datetime.fromisoformat(expires_at_text.replace("Z", "+00:00")).replace(
+                    tzinfo=None
+                )
             except ValueError:
                 self.logger.warning("토큰 만료 시각 파싱 실패: %s", expires_at)
 
